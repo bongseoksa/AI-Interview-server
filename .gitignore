@@ -69,3 +69,34 @@ model_cache/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Supabase
+supabase/.temp/
+supabase/.env
+supabase/.env.local
+supabase/.env.keys
+
+# Docker
+.dockerenv
+docker-compose.override.yml
+
+# Secrets / Certificates
+*.pem
+*.p12
+*.key
+*.secret
+credentials.json
+serviceAccountKey.json
+
+# Deployment
+.vercel/
+.railway/
+.render/
+
+# LLM / AI service
+model_downloads/
+*.gguf
+*.safetensors
+
+# Alembic
+alembic/versions/__pycache__/

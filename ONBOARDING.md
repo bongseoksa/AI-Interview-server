@@ -24,12 +24,17 @@
 ```bash
 cd AI-Interview-server
 
+# Git pre-commit 훅 활성화 (최초 1회)
+git config core.hooksPath .githooks
+
 # 현재 미착수 상태 — 기술 스택 확정 후 설치 가이드 업데이트 예정
 # 예상 설치 흐름:
 # python3.13 -m venv .venv
 # source .venv/bin/activate
 # pip install -r requirements.txt
 ```
+
+> `git config core.hooksPath .githooks`를 실행하면 커밋 시 민감 파일(.env, 인증서, DB URL 등) 차단 + 시크릿 패턴 스캔이 자동 수행됩니다.
 
 ## 4. 실행
 
