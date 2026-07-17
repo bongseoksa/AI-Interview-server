@@ -67,14 +67,19 @@ cd AI-Interview-server
   qa-engineer.md      # API 테스트, 프롬프트 QA
 ```
 
-## 8. 비용 제약
+## 8. AI 모델 전략
 
-- LLM API: 무료/최소 비용 (로컬 모델 또는 무료 티어)
-- DB: 무료 티어만 사용 (용량/연결 수 제한 고려)
+- **Orchestrator 2-Tier (Ollama 로컬)**: 자료 수집·개발은 Gemma 4 26B (고성능 고정), 유저 대면 콘텐츠는 Gemma 4 12B (경량) — orchestrator 레포 참조
+- **서비스 LLM**: TBD (Step 6 아키텍처 설계 시 결정). 유저 대면이므로 비용 효율적인 경량 모델 예정
+
+## 9. 비용 제약
+
+- LLM API: 유저 대면은 비용 효율적인 경량 모델 우선 활용
+- DB: Supabase 무료 티어 (용량/연결 수 제한 고려)
 - 서버: 무료 호스팅 (Railway Free, Render Free 등)
 - 모든 외부 서비스: qhdtjd4517@gmail.com 계정으로 가입
 
-## 9. 관련 문서
+## 10. 관련 문서
 
 - `CLAUDE.md` — 에이전트 컨텍스트 (Claude Code용)
 - Notion 사업계획서: 레포지토리 3.2 섹션
