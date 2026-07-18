@@ -54,7 +54,7 @@ git config core.hooksPath .githooks
 
 ## 6. 현재 상태
 
-**미착수** — Step 6 (아키텍처 설계) 이후 기술 스택 결정 예정
+**미착수** — Phase 6 (아키텍처 설계) 이후 기술 스택 결정 예정
 
 확정 예정 사항:
 - Python 웹 프레임워크 (FastAPI / Django 등)
@@ -74,8 +74,8 @@ git config core.hooksPath .githooks
 
 ## 8. AI 모델 전략
 
-- **Orchestrator 2-Tier (Ollama 로컬)**: 자료 수집·개발은 Gemma 4 26B (고성능 고정), 유저 대면 콘텐츠는 Gemma 4 12B (경량) — orchestrator 레포 참조
-- **서비스 LLM**: TBD (Step 6 아키텍처 설계 시 결정). 유저 대면이므로 비용 효율적인 경량 모델 예정
+- AI 모델 2-Tier 전략 상세: orchestrator 레포 참조
+- **서비스 LLM**: TBD (Phase 6 아키텍처 설계 시 결정)
 
 ## 9. 비용 제약
 

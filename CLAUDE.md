@@ -10,12 +10,12 @@ AI Interview 서비스의 백엔드 서버 레포.
 
 ## 상태
 
-미착수 — 기술 스택 미정 (Step 6 아키텍처 설계 이후 결정)
+미착수 — 기술 스택 미정 (Phase 6 아키텍처 설계 이후 결정)
 
 ## AI 모델 전략
 
-- **Orchestrator 2-Tier**: 자료 수집·개발용은 Gemma 4 26B (고성능 고정), 유저 대면 콘텐츠는 Gemma 4 12B (경량) — 상세는 orchestrator CLAUDE.md 참조
-- **서비스 LLM**: TBD (Step 6 아키텍처 설계 시 결정). 유저 대면 기능이므로 비용 효율적인 모델 선택 예정
+- AI 모델 2-Tier 전략 상세: `AI-Interview-orchestrator/CLAUDE.md` 참조
+- **서비스 LLM**: TBD (Phase 6 아키텍처 설계 시 결정)
 - **LLM 호출 방식**: TBD (서버 프록시 vs Next.js Route Handlers 직접 호출)
 
 ## 비용 제약
