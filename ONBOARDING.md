@@ -7,17 +7,18 @@
 
 ## 1. 필수 개념
 
-- **API 서버**: 프론트엔드(AI-Interview-web)에 REST/GraphQL API를 제공하는 Python 백엔드
-- **AI/LLM 파이프라인**: 개념 설명 생성, 면접 질문 출제, 답변 평가를 처리하는 AI 워크플로우
-- **프롬프트 엔지니어링**: LLM에 전달하는 프롬프트를 버전 관리하고 A/B 테스트 가능한 구조로 관리
-- **비용 최적화**: 무자본 운영이므로 무료 DB/호스팅/LLM만 사용 — 모든 설계에 비용 제약 반영
+- **FastAPI 서버**: 프론트엔드(AI-Interview-web)에 REST API를 제공하는 Python 백엔드
+- **AI 면접 엔진**: 면접 질문 출제, 답변 평가(Rubric 기반), 피드백 생성을 처리하는 AI 파이프라인 (M1부터 구현)
+- **Supabase 공유**: web 레포와 동일한 Supabase 프로젝트를 사용하며, Service Role Key로 RLS를 우회
+- **비용 최적화**: 무자본 운영이므로 무료/저비용 서비스만 사용 — 월 $5 미만 목표
 
 ## 2. 사전 요구사항
 
 | 항목 | 최소 버전 | 확인 명령어 |
 |------|----------|-----------|
-| Python | 3.11+ | `python3 --version` |
+| Python | 3.13 | `python3.13 --version` |
 | Git | 2.x | `git --version` |
+| Docker | 20.x (선택) | `docker --version` |
 
 ## 3. 설치
 
@@ -27,11 +28,15 @@ cd AI-Interview-server
 # Git pre-commit 훅 활성화 (최초 1회)
 git config core.hooksPath .githooks
 
-# 현재 미착수 상태 — 기술 스택 확정 후 설치 가이드 업데이트 예정
-# 예상 설치 흐름:
-# python3.13 -m venv .venv
-# source .venv/bin/activate
-# pip install -r requirements.txt
+# 가상환경 생성 및 의존성 설치
+python3.13 -m venv .venv
+source .venv/bin/activate
+pip install uv
+uv pip install -e ".[dev]"
+
+# 환경 변수 설정
+cp .env.example .env
+# .env 파일 편집: Supabase URL, Service Role Key, JWT Secret 입력
 ```
 
 > `git config core.hooksPath .githooks`를 실행하면 커밋 시 민감 파일(.env, 인증서, DB URL 등) 차단 + 시크릿 패턴 스캔이 자동 수행됩니다.
@@ -39,54 +44,89 @@ git config core.hooksPath .githooks
 ## 4. 실행
 
 ```bash
-# 현재 미착수 — 프레임워크 확정 후 실행 명령어 업데이트 예정
-# 예상 실행 흐름:
-# source .venv/bin/activate
-# python -m uvicorn main:app --reload --port 8000
+source .venv/bin/activate
+
+# 개발 서버 (핫 리로드)
+uvicorn app.main:app --reload --port 8000
+
+# 또는 Docker
+docker-compose up
 ```
 
-## 5. 종료
+- API 문서: http://localhost:8000/docs
+- 헬스체크: http://localhost:8000/v1/health/
+
+## 5. 테스트
+
+```bash
+# 전체 테스트
+pytest -v
+
+# 린트
+ruff check .
+```
+
+## 6. 종료
 
 ```bash
 # 개발 서버: 터미널에서 Ctrl+C
 # 가상환경 비활성화: deactivate
+# Docker: docker-compose down
 ```
 
-## 6. 현재 상태
+## 7. 현재 상태
 
-**미착수** — Phase 6 (아키텍처 설계) 이후 기술 스택 결정 예정
+**Phase 5 M0 완료** — FastAPI 서버 인프라 구축
 
-확정 예정 사항:
-- Python 웹 프레임워크 (FastAPI / Django 등)
-- 데이터베이스 (Supabase Free / PlanetScale Free 등)
-- AI/LLM 통합 방식
-- 호스팅 (Railway Free / Render Free 등)
+완료 사항:
+- FastAPI + Pydantic Settings + Supabase 클라이언트 연동
+- JWT 로컬 검증 (python-jose, HS256)
+- Health check endpoint (DB 연결 상태 포함)
+- CORS 미들웨어 (환경변수 기반)
+- Docker (멀티스테이지 빌드) + docker-compose
+- GitHub Actions CI (ruff + pytest)
+- 테스트 3건 통과
 
-## 7. 프로젝트 구조 (예정)
+## 8. 프로젝트 구조
 
 ```
-# 기술 스택 확정 후 구조 업데이트 예정
-.claude/agents/       # Claude Code 서브에이전트 (3개, 배포 완료)
-  backend-senior.md   # API 서버, LLM 파이프라인
-  data-engineer.md    # DB 스키마 설계
-  qa-engineer.md      # API 테스트, 프롬프트 QA
+app/
+  main.py                 # FastAPI 앱 초기화, CORS, 라우터 마운트
+  core/
+    config.py             # Pydantic Settings (환경변수 관리)
+    database.py           # Supabase 클라이언트 (lazy 싱글톤)
+    security.py           # JWT 검증 (Depends 기반)
+  api/v1/
+    router.py             # API v1 라우터
+    endpoints/
+      health.py           # GET /v1/health/
+  models/
+    common.py             # 공통 응답/에러 스키마
+  services/               # 비즈니스 로직 (M1부터)
+tests/
+  conftest.py             # AsyncClient 픽스처
+  test_health.py          # 헬스체크 + CORS 테스트
+.claude/agents/           # Claude Code 서브에이전트
+  backend-senior.md       # API 서버, LLM 파이프라인
+  data-engineer.md        # DB 스키마 설계
+  qa-engineer.md          # API 테스트, 프롬프트 QA
 ```
 
-## 8. AI 모델 전략
+## 9. AI 모델 전략
 
 - AI 모델 2-Tier 전략 상세: orchestrator 레포 참조
-- **서비스 LLM**: TBD (Phase 6 아키텍처 설계 시 결정)
+- **서비스 LLM**: Groq 또는 DeepSeek (저비용 고속) — M1에서 결정
+- **개발 LLM**: Ollama 로컬 (gemma4:26b) — orchestrator에서 설계용
 
-## 9. 비용 제약
+## 10. 비용 제약
 
-- LLM API: 유저 대면은 비용 효율적인 경량 모델 우선 활용
-- DB: Supabase 무료 티어 (용량/연결 수 제한 고려)
-- 서버: 무료 호스팅 (Railway Free, Render Free 등)
-- 모든 외부 서비스: qhdtjd4517@gmail.com 계정으로 가입
+- Supabase: Free Tier (500MB DB, 50K MAU)
+- 서버: Railway Free Tier → $5~7/month at scale
+- LLM API: Groq/DeepSeek 저비용 tier
+- 총 월 $5 미만 목표
 
-## 10. 관련 문서
+## 11. 관련 문서
 
 - `CLAUDE.md` — 에이전트 컨텍스트 (Claude Code용)
-- Notion 사업계획서: 레포지토리 3.2 섹션
 - `AI-Interview-web` — 프론트엔드 (API 소비자)
 - `AI-Interview-orchestrator` — 에이전트 정의 원본

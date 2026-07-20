@@ -4,17 +4,19 @@
 
 ## Status
 
-**미착수** - Phase 6 (아키텍처 설계) 이후 기술 스택 결정 예정
+**Phase 5 M0 완료** — FastAPI 서버 인프라 구축
 
-## Planned Stack
+## Tech Stack
 
-| Category | Candidates |
-|----------|-----------|
-| Language | Python 3.11+ |
-| Framework | FastAPI / Django (TBD) |
-| Database | Supabase Free (PostgreSQL) |
-| Hosting | Railway Free / Render Free |
-| Service LLM | TBD (cost-efficient model) |
+| Category | Stack |
+|----------|-------|
+| Language | Python 3.13 |
+| Framework | FastAPI |
+| Auth | Supabase JWT (python-jose) |
+| Database | Supabase PostgreSQL (shared with web) |
+| Hosting | Railway (planned) |
+| CI/CD | GitHub Actions |
+| Container | Docker |
 
 ## Getting Started
 
@@ -22,25 +24,77 @@
 # Git pre-commit 훅 활성화 (최초 1회)
 git config core.hooksPath .githooks
 
-# 기술 스택 확정 후 업데이트 예정
-# python3.13 -m venv .venv
-# source .venv/bin/activate
-# pip install -r requirements.txt
+# 환경 설정
+python3.13 -m venv .venv
+source .venv/bin/activate
+pip install uv
+uv pip install -e ".[dev]"
+
+# 환경 변수 설정
+cp .env.example .env
+# .env 파일에 Supabase URL, Service Role Key, JWT Secret 입력
+
+# 서버 실행
+uvicorn app.main:app --reload --port 8000
+
+# API 문서 확인
+open http://localhost:8000/docs
 ```
 
-## Planned Responsibilities
+## Testing
 
-- REST API server for AI-Interview-web
-- AI/LLM pipeline (concept explanation, question generation, answer evaluation)
-- Prompt versioning & A/B testing
-- Database schema & migrations
+```bash
+# 테스트 실행
+pytest -v
+
+# 린트
+ruff check .
+```
+
+## Docker
+
+```bash
+# 로컬 개발
+docker-compose up
+
+# 프로덕션 빌드
+docker build -t ai-interview-server .
+docker run -p 8000:8000 --env-file .env ai-interview-server
+```
+
+## API Endpoints
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/v1/health/` | No | Health check with DB status |
+| GET | `/docs` | No | Swagger UI |
+
+## Project Structure
+
+```
+app/
+  main.py              # FastAPI app initialization
+  core/
+    config.py          # Pydantic Settings
+    database.py        # Supabase client
+    security.py        # JWT verification
+  api/v1/
+    router.py          # API v1 router
+    endpoints/
+      health.py        # Health check
+  models/
+    common.py          # Shared schemas
+  services/            # Business logic (M1+)
+tests/
+  conftest.py          # Test fixtures
+  test_health.py       # Health + CORS tests
+```
 
 ## Security
 
 `.githooks/pre-commit` 훅이 커밋 시 민감 파일과 시크릿 패턴을 자동 차단합니다.
 
 ```bash
-# 훅 활성화 (최초 1회)
 git config core.hooksPath .githooks
 ```
 
