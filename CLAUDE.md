@@ -18,7 +18,7 @@ Phase 5 M0 완료 — FastAPI 인프라 구축, 배포 파이프라인 준비
 |----------|-------|
 | Language | Python 3.13 |
 | Framework | FastAPI >= 0.115 |
-| Auth | Supabase JWT 로컬 검증 (python-jose, HS256) |
+| Auth | Supabase JWT 로컬 검증 (ES256 JWKS primary + HS256 fallback, python-jose) |
 | Database | Supabase Free (PostgreSQL, web 레포와 공유) |
 | Hosting | Railway (예정) |
 | CI/CD | GitHub Actions (ruff + pytest) |
@@ -33,7 +33,7 @@ app/
   core/
     config.py             # Pydantic Settings (환경변수 관리)
     database.py           # Supabase 클라이언트 (lazy 싱글톤)
-    security.py           # JWT 검증 (Depends 기반)
+    security.py           # JWT 검증 (ES256 JWKS + HS256 fallback, Depends 기반)
   api/v1/
     router.py             # API v1 라우터
     endpoints/
@@ -44,6 +44,7 @@ app/
 tests/
   conftest.py             # AsyncClient 픽스처
   test_health.py          # 헬스체크 + CORS 테스트
+  test_auth.py            # JWT 검증 테스트 (ES256 + HS256 + 에러 케이스)
 Dockerfile                # 멀티스테이지 빌드
 docker-compose.yml        # 로컬 개발용
 .github/workflows/ci.yml  # GitHub Actions CI
@@ -79,8 +80,9 @@ docker-compose up
 |------|------|
 | `SUPABASE_URL` | Supabase 프로젝트 URL |
 | `SUPABASE_SERVICE_ROLE_KEY` | 서비스 롤 키 (RLS 우회) |
-| `SUPABASE_JWT_SECRET` | JWT 서명 검증용 시크릿 |
-| `CORS_ORIGINS` | 허용 Origin (쉼표 구분) |
+| `SUPABASE_JWT_SECRET` | HS256 레거시 폴백용 시크릿 (ES256은 JWKS에서 자동 취득) |
+| `JWKS_CACHE_TTL` | JWKS 캐시 유지 시간 (초, 기본 86400=24h) |
+| `CORS_ORIGINS` | 허용 Origin (JSON 배열 형식) |
 | `DEBUG` | 디버그 모드 (true/false) |
 
 ## API 엔드포인트

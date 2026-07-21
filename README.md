@@ -12,7 +12,7 @@
 |----------|-------|
 | Language | Python 3.13 |
 | Framework | FastAPI |
-| Auth | Supabase JWT (python-jose) |
+| Auth | Supabase JWT (ES256 JWKS + HS256 fallback, python-jose) |
 | Database | Supabase PostgreSQL (shared with web) |
 | Hosting | Railway (planned) |
 | CI/CD | GitHub Actions |

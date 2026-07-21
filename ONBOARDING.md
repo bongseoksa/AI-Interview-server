@@ -80,12 +80,12 @@ ruff check .
 
 완료 사항:
 - FastAPI + Pydantic Settings + Supabase 클라이언트 연동
-- JWT 로컬 검증 (python-jose, HS256)
+- JWT 로컬 검증 (ES256 JWKS primary + HS256 fallback, python-jose)
 - Health check endpoint (DB 연결 상태 포함)
 - CORS 미들웨어 (환경변수 기반)
 - Docker (멀티스테이지 빌드) + docker-compose
 - GitHub Actions CI (ruff + pytest)
-- 테스트 3건 통과
+- 테스트 9건 통과 (헬스체크 3건 + JWT 인증 6건)
 
 ## 8. 프로젝트 구조
 
