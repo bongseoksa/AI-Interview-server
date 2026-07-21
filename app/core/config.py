@@ -8,7 +8,8 @@ class Settings(BaseSettings):
 
     SUPABASE_URL: str = ""
     SUPABASE_SERVICE_ROLE_KEY: str = ""
-    SUPABASE_JWT_SECRET: str = ""
+    SUPABASE_JWT_SECRET: str = ""  # Legacy HS256 (fallback)
+    JWKS_CACHE_TTL: int = 86400  # 24 hours
 
     CORS_ORIGINS: list[str] = ["http://localhost:3000"]
 
